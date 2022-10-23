@@ -14,9 +14,6 @@ interface ILongword {
     void copy(longword other) throws Exception; // copies the values of the bits from another longword into this one
     void set(int value) throws Exception; // set the value of the bits of this longword (used for tests)
 }
-
-
-
 public class longword implements ILongword
 {
     //Attribute of a longword is an array of bits
@@ -35,7 +32,8 @@ public class longword implements ILongword
         }
     }
 
-    public longword(int val) throws Exception {
+    public longword(int val) throws Exception
+    {
         //By default, an empty array?
         //Maybe make an array of 0's.... maybe though
         this.vals = new bit[32];
@@ -97,7 +95,11 @@ public class longword implements ILongword
         if(i > 31 || i < 0) throw new Exception("Index out of bounds: Longword indexes from 0 to 31");
 
         //Get this bit in the vals array at index i
-        bit output = this.vals[i];
+        bit output;
+
+        boolean value = this.vals[i].getValue();
+
+        output = new bit(value);
 
         return output;
     }
@@ -105,7 +107,7 @@ public class longword implements ILongword
     public void setBit(int i, bit value) throws Exception
     {
         //If an index, greater than 31 and less than 0, throw an exception where index are out of bounds
-        if(i > 31 || i < 0) throw new Exception("Index out of bounds: Longword indexes from 0 to 31");
+        //if(i >= 31 || i < 0) throw new Exception("Index out of bounds: Longword indexes from 0 to 31");
 
         //Set vals[i] with passed in bit
         this.vals[i] = value;
@@ -356,7 +358,18 @@ public class longword implements ILongword
 
     public void set(int value) throws Exception
     {
+
         int indexVals = 31;
+
+        if(value == 0)
+        {
+            for(int i = 0; i < 31; i++)
+            {
+                this.setBit(i, new bit());
+            }
+
+            return;
+        }
 
         //If the value requested is negative
         if(value < 0)
@@ -408,7 +421,7 @@ public class longword implements ILongword
 
             for(int i = indexVals; i >= 0; i--)
             {
-                this.setBit(indexVals, new bit(false));
+                this.setBit(indexVals, new bit());
             }
         }
     }
