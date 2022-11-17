@@ -268,8 +268,6 @@ public class longword implements ILongword
             {
                 output = output + "0";
             }
-
-
         }
 
         return output;

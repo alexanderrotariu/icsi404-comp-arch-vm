@@ -49,6 +49,6 @@ public class cpu_test1
         if(test1.registers[6].getSigned() != 70) throw new Exception("multiplying two registers has failed.");
 
         //Yay! everything is good! : )
-        System.out.println("All computer testing passeed!");
+        System.out.println("All computer testing passed!");
     }
 }
