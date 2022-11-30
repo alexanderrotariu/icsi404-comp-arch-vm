@@ -92,8 +92,5 @@ public class cpu_test2
 
 
         System.out.println("All CPU_test2 testing passed");
-
-
-
     }
 }

@@ -303,6 +303,45 @@ public class Assembler
 
                     break;
 
+                case "push":
+                    String pushOp = "0110";
+                    String middlePush = "00000000";
+
+                    outputs[i] = pushOp + middlePush + getRegister(splitStrings[1]);
+
+                    break;
+
+                case "pop":
+                    String popOp = "0110";
+                    String middlePop = "01000000";
+
+                    outputs[i] = popOp + middlePop + getRegister(splitStrings[1]);
+
+                    break;
+
+                case "call":
+                    String callOp = "0110";
+                    String middleCall = "10";
+
+                    longword addressCall = new longword();
+                    addressCall.set(Integer.parseInt(splitStrings[1]));
+                    String addressCallStr = addressCall.zeroOnes();
+
+                    String addressBinCall = addressCallStr.substring(22);
+
+                    outputs[i] = callOp + middleCall + addressBinCall;
+
+                    break;
+
+                case "return":
+                    String returnOp = "0110";
+                    String middleReturn = "110000000000";
+
+                    outputs[i] = returnOp + middleReturn;
+
+                    break;
+
+
                 default:
                     //default case, halt.
                     outputs[i] = "0000000000000000";

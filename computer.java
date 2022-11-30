@@ -6,6 +6,7 @@ public class computer
     bit running = new bit(true);
     //Program counter
     longword PC = new longword();
+    longword SP = new longword();
     //Current Instruction
     longword currentInstruction = new longword();
 
@@ -47,6 +48,8 @@ public class computer
     //Computer Default constructor
     public computer() throws Exception
     {
+        //initialize SP to 1020
+        SP.set(1020);
         for(int i = 0; i < registers.length; i++)
         {
             registers[i] = new longword();
@@ -247,6 +250,7 @@ public class computer
             //Setting masks
             addressMask.set(511);
             signMask.set(1);
+
             conditionMask.set(3);
 
             //sihfting and masking to get the bits we need
@@ -324,6 +328,92 @@ public class computer
                 //if conditionals dont match, do nothing
             }
 
+        }
+        //0110 opcode for push pop call return
+        else if(operation[0].getValue() == false && operation[1].getValue() == true && operation[2].getValue() == true && operation[3].getValue() == false)
+        {
+            //every time we push, subtract 4
+            //every time we pop, add 4
+
+            //finding our opcode bits
+            longword opcodeBits = new longword();
+            opcodeBits.set(3);
+
+            //Getting the conditionalCode bits for push pop call return
+            longword conditionalCode = currentInstruction.rightShift(26).and(opcodeBits);
+
+            //new bits to hold those values
+            bit opCode1 = new bit();
+            bit opCode2 = new bit();
+
+            //Setting bits
+            if(conditionalCode.getBit(31).getValue())
+            {
+                opCode1.set(true);
+                //otherwise false;
+
+            }
+            if(conditionalCode.getBit(30).getValue())
+            {
+                opCode2.set(true);
+                //otherwise false;
+            }
+
+
+            //opCode1 opCode2 == bit combination to determine operation
+
+            //Making masks for shifting
+            longword four = new longword();
+            four.set(4);
+
+            longword registerMask = new longword();
+            registerMask.set(15);
+
+            longword addressMask = new longword();
+            addressMask.set(1023);
+
+
+            //Right shift and mask to get the 10 bit address we need
+            int regNum = currentInstruction.rightShift(16).and(registerMask).getSigned();
+            longword addressJump = currentInstruction.rightShift(16).and(addressMask);
+
+            //determine which operation we need to perfor
+            if(!opCode1.getValue() && !opCode2.getValue())
+            {
+                //push operation
+                //at our stack pointer, push the num in reg to stack
+                storage.write(SP, registers[regNum]);
+                //increment stack pointer
+                SP = rippleAdder.subtract(SP, four);
+
+
+            }
+            else if(opCode1.getValue() && !opCode2.getValue())
+            {
+                //pop operation
+                //increment stack pointer
+                SP = rippleAdder.add(SP, four);
+                //write from stack to register
+                longword registerValue = storage.read(SP);
+                registers[regNum] = registerValue;
+
+            }
+            else if(!opCode1.getValue() && opCode2.getValue())
+            {
+                //call operation
+                //combination of push and jump
+                storage.write(SP, PC);
+                PC.set(addressJump.getSigned()); //jumps to that address
+                SP = rippleAdder.subtract(SP, four);
+
+            }
+            else
+            {
+                //return
+                //combination of call and jump
+                SP = rippleAdder.add(SP, four);
+                PC = storage.read(SP); //jump to that instruction
+            }
         }
         else
         {
